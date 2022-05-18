@@ -47,7 +47,7 @@ async function run() {
 
         // get tasks
         app.get('/tasks', async (req, res) => {
-            const tasks = await tasks.find().toArray();
+            const tasks = await tasksCollection.find().toArray();
             res.send(tasks);
         })
 
