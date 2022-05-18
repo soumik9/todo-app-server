@@ -76,6 +76,14 @@ async function run() {
             res.send(result);
         })
 
+        // api delete product
+        app.delete('/task/:taskId', async (req, res) => {
+            const id = req.params.taskId;
+            const query = { _id: ObjectId(id) };
+            const result = await tasksCollection.deleteOne(query);
+            res.send(result);
+        })
+
     } finally {
 
     }
