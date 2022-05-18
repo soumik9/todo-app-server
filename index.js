@@ -6,10 +6,30 @@ require('dotenv').config();
 
 const app = express();
 const port = process.env.PORT || 5000;
-
+ 
 //middleware
 app.use(cors());
 app.use(express.json());
+
+
+// jwt verification
+function verifyJWT(req, res, next){
+    const authHeader = req.headers.authorization;
+   
+    if(!authHeader){
+        return res.status(401).send({message: 'Unauthorized access'});
+    }
+
+    const token = authHeader.split(' ')[1];
+
+    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
+        if(err){
+            return res.status(403).send({message: 'Forbidden access'});
+        }
+        req.decoded = decoded;
+        next();
+    })
+}
 
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@todo.zjxkw.mongodb.net/?retryWrites=true&w=majority`;
@@ -46,11 +66,17 @@ async function run() {
         })
 
         // get tasks
-        app.get('/tasks', async (req, res) => {
+        app.get('/tasks', verifyJWT, async (req, res) => {
+            const decodedEmail = req.decoded.email;
             const email = req.query.email;
-            const query = { email: email };
-            const tasks = await tasksCollection.find(query).toArray();
-            res.send(tasks);
+
+            if(email === decodedEmail){
+                const query = { email: email };
+                const tasks = await tasksCollection.find(query).toArray();
+                res.send(tasks);
+            }else{
+                res.status(403).send({ message: 'forbidden access' });
+            }
         })
 
         // add task
