@@ -18,6 +18,15 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 async function run(){
     try{
 
+         // connect to mongodb collection
+         await client.connect();
+         const tasksCollection = client.db("todo-app").collection("tasks");
+
+             // api homepage
+        app.get('/' , (req, res) => {
+            res.send('Todo App Server Is Ready')
+        })
+
     }finally{
 
     }
