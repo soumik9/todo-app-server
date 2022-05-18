@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
@@ -56,6 +56,24 @@ async function run() {
             const task = req.body;
             const result = await tasksCollection.insertOne(task);
             return res.send(result);
+        })
+
+        // update task status
+        app.put('/task/:taskId', async (req, res) => {
+            const id = req.params.taskId;
+            const updatedTask = req.body;
+            console.log(updatedTask);
+            const filter = { _id: ObjectId(id) };
+            const options = { upsert: true };
+
+            const updatedDoc = {
+                $set: {
+                    status: updatedTask.newStatus,
+                }
+            }
+
+            const result = await tasksCollection.updateOne(filter, updatedDoc, options);
+            res.send(result);
         })
 
     } finally {
