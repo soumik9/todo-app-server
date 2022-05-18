@@ -47,7 +47,9 @@ async function run() {
 
         // get tasks
         app.get('/tasks', async (req, res) => {
-            const tasks = await tasksCollection.find().toArray();
+            const email = req.query.email;
+            const query = { email: email };
+            const tasks = await tasksCollection.find(query).toArray();
             res.send(tasks);
         })
 
