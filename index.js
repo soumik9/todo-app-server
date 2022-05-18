@@ -33,7 +33,6 @@ async function run() {
         app.put('/users/:email', async (req, res) => {
             const email = req.params.email;
             const user = req.body
-            console.log(user);
             const filter = { email: email };
             const options = { upsert: true };
 
@@ -44,6 +43,13 @@ async function run() {
             const result = await userCollection.updateOne(filter, updateDoc, options);
             const token = jwt.sign({ email: email }, process.env.ACCESS_TOKEN, { expiresIn: '1d' });
             res.send({ result, token });
+        })
+
+        // add task
+        app.post('/add-task', async (req, res) => {
+            const task = req.body;
+            const result = await tasksCollection.insertOne(task);
+            return res.send(result);
         })
 
     } finally {
