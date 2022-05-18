@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const { MongoClient, ServerApiVersion } = require('mongodb');
+const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
 const app = express();
@@ -32,6 +33,7 @@ async function run() {
         app.put('/users/:email', async (req, res) => {
             const email = req.params.email;
             const user = req.body
+            console.log(user);
             const filter = { email: email };
             const options = { upsert: true };
 
