@@ -15,19 +15,36 @@ const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@tod
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
 
 
-async function run(){
-    try{
+async function run() {
+    try {
 
-         // connect to mongodb collection
-         await client.connect();
-         const tasksCollection = client.db("todo-app").collection("tasks");
+        // connect to mongodb collection
+        await client.connect();
+        const tasksCollection = client.db("todo-app").collection("tasks");
+        const userCollection = client.db("todo-app").collection("users");
 
-             // api homepage
-        app.get('/' , (req, res) => {
+        // api homepage
+        app.get('/', (req, res) => {
             res.send('Todo App Server Is Ready')
         })
 
-    }finally{
+        // on login get user info
+        app.put('/users/:email', async (req, res) => {
+            const email = req.params.email;
+            const user = req.body
+            const filter = { email: email };
+            const options = { upsert: true };
+
+            const updateDoc = {
+                $set: user,
+            }
+
+            const result = await userCollection.updateOne(filter, updateDoc, options);
+            const token = jwt.sign({ email: email }, process.env.ACCESS_TOKEN, { expiresIn: '1d' });
+            res.send({ result, token });
+        })
+
+    } finally {
 
     }
 }
