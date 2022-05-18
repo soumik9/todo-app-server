@@ -45,6 +45,12 @@ async function run() {
             res.send({ result, token });
         })
 
+        // get tasks
+        app.get('/tasks', async (req, res) => {
+            const tasks = await tasks.find().toArray();
+            res.send(tasks);
+        })
+
         // add task
         app.post('/add-task', async (req, res) => {
             const task = req.body;
